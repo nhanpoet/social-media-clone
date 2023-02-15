@@ -1,0 +1,49 @@
+.rightbar {
+  flex: 3;
+  position: sticky;
+  overflow: scroll;
+  top: 70px;
+  height: calc(100vh - 70px);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .container {
+    background-color: white;
+    padding: 20px;
+
+    .item {
+      span {
+        color: gray;
+      }
+      .user {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .userInfo {
+          display: flex;
+          align-items: center;
+
+          img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+          span {
+          }
+        }
+        .buttons {
+          display: flex;
+          align-items: center;
+          button {
+              
+          }
+        }
+      }
+    }
+  }
+}
