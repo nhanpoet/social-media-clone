@@ -4,6 +4,8 @@ import NavBar from "./components/navbar/NavBar.jsx";
 import LeftBar from "./components/leftbar/LeftBar";
 import RightBar from "./components/rightbar/RightBar";
 
+import "../src/style.scss";
+
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import {
@@ -12,22 +14,31 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
+import { useContext } from "react";
+import { DarkModeContext } from "./context/DarkModeContext";
+import { AuthContext } from "./context/AuthContext";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
-  const currentUser = true;
+  const currentUser = useContext(AuthContext);
+
+  const { darkMode } = useContext(DarkModeContext);
+
+  const queryClient = new QueryClient();
 
   const Layout = () => {
     return (
-      <div>
-        <NavBar />
-        <div style={{ display: "flex" }}>
-          <LeftBar />
-          <div style={{ flex: 6 }}>
-            <Outlet />{" "}
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <NavBar />
+          <div style={{ display: "flex" }}>
+            <LeftBar />
+            <Outlet />
+            <RightBar />
           </div>
-          <RightBar />
         </div>
-      </div>
+      </QueryClientProvider>
     );
   };
 
