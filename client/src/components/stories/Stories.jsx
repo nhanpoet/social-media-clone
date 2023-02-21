@@ -1,12 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import "./stories.scss";
 
 function Stories() {
   const { currentUser } = useContext(AuthContext);
-  const { isLoading, error, data } = useQuery("");
-
   //TEMPORARY
 
   const stories = [
@@ -33,15 +30,11 @@ function Stories() {
   ];
   return (
     <div className="stories">
-      {isLoading ? (
-        "Loading"
-      ) : (
-        <div className="story">
-          <img src={"/upload/" + currentUser.profilePic} alt="" />
-          <span>{currentUser.name}</span>
-          <button>+</button>
-        </div>
-      )}
+      <div className="story">
+        <img src={"/upload/" + currentUser.profilePic} alt="" />
+        <span>{currentUser.name}</span>
+        <button>+</button>
+      </div>
       {stories.map((story) => (
         <div className="story" key={story.id}>
           <img src={story.img} alt="" />

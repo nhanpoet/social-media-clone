@@ -12,12 +12,10 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { DarkModeContext } from "../../context/DarkModeContext";
 import { AuthContext } from "../../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
 
 function NavBar() {
   const { toggle, darkMode } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
-  const { isLoading, error, data } = useQuery("");
 
   return (
     <div className="navbar">
@@ -37,19 +35,15 @@ function NavBar() {
           <input type="text" placeholder="Search..." />
         </div>
       </div>
-      {isLoading ? (
-        "Loading"
-      ) : (
-        <div className="right">
-          <PersonOutlinedIcon />
-          <EmailOutlinedIcon />
-          <NotificationsOutlinedIcon />
-          <div className="user">
-            <img src={"/upload/" + currentUser.profilePic} alt="" />
-            <span>{currentUser.name}</span>
-          </div>
+      <div className="right">
+        <PersonOutlinedIcon />
+        <EmailOutlinedIcon />
+        <NotificationsOutlinedIcon />
+        <div className="user">
+          <img src={"/upload/" + currentUser.profilePic} alt="" />
+          <span>{currentUser.name}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }
