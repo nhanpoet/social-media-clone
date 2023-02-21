@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import likeRoutes from "./routes/likes.js";
 import commentRoutes from "./routes/comments.js";
 import postRoutes from "./routes/posts.js";
+import relationshipRoutes from "./routes/relationships.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -46,6 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/relationships", relationshipRoutes);
 
 app.listen(8800, () => {
   console.log("Api working");

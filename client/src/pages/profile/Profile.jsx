@@ -9,62 +9,122 @@ import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Posts from "../../components/posts/Posts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import { useLocation } from "react-router-dom";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import Update from "../../components/update/Update";
 
 function Profile() {
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
+
+  const { isLoading, error, data } = useQuery(["user"], () =>
+    makeRequest.get("/users/find/" + userId).then((res) => {
+      return res.data;
+    })
+  );
+
+  const { isLoading: rIsLoading, data: relationshipData } = useQuery(
+    ["relationship"],
+    () =>
+      makeRequest.get("/relationships?followedUserId=" + userId).then((res) => {
+        return res.data;
+      })
+  );
+  console.log(openUpdate);
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (following) => {
+      if (following)
+        return makeRequest.delete("/relationships?userId=" + userId);
+      return makeRequest.post("/relationships", { userId });
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["relationship"]);
+      },
+    }
+  );
+
+  const handleFollow = () => {
+    mutation.mutate(relationshipData.includes(currentUser.id));
+  };
+
   return (
     <div className="profile">
-      <div className="images">
-        <img
-          src="https://photo2.tinhte.vn/data/attachment-files/2021/09/5660152_city_road_buildings_188197_3840x2160.jpg"
-          alt=""
-          className="cover"
-        />
-        <img
-          src="https://i.pinimg.com/564x/63/a4/0a/63a40a47922a3f48fe07134293af8478.jpg"
-          alt=""
-          className="profilePic"
-        />
-      </div>
-      <div className="profileContainer">
-        <div className="uInfo">
-          <div className="left">
-            <a href="https://www.facebook.com/">
-              <FacebookTwoToneIcon size={48} />
-            </a>
-            <a href="https://www.facebook.com/">
-              <LinkedInIcon size={48} />
-            </a>
-            <a href="https://www.facebook.com/">
-              <InstagramIcon size={48} />
-            </a>
-            <a href="https://www.facebook.com/">
-              <PinterestIcon size={48} />
-            </a>
-            <a href="https://www.facebook.com/">
-              <TwitterIcon size={48} />
-            </a>
+      {isLoading ? (
+        "loading"
+      ) : (
+        <>
+          <div className="images">
+            <img src={"/upload/" + data.coverPic} alt="" className="cover" />
+            <img
+              src={"/upload/" + data.profilePic}
+              alt=""
+              className="profilePic"
+            />
           </div>
-          <div className="center">
-            <span>NPoet</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>VietNam</span>
+          <div className="profileContainer">
+            <div className="uInfo">
+              <div className="left">
+                <a href="https://www.facebook.com/">
+                  <FacebookTwoToneIcon size={48} />
+                </a>
+                <a href="https://www.facebook.com/">
+                  <LinkedInIcon size={48} />
+                </a>
+                <a href="https://www.facebook.com/">
+                  <InstagramIcon size={48} />
+                </a>
+                <a href="https://www.facebook.com/">
+                  <PinterestIcon size={48} />
+                </a>
+                <a href="https://www.facebook.com/">
+                  <TwitterIcon size={48} />
+                </a>
               </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>NPoet.dev</span>
+              <div className="center">
+                <span>{data.name}</span>
+                <div className="info">
+                  <div className="item">
+                    <PlaceIcon />
+                    <span>{data.city}</span>
+                  </div>
+                  <div className="item">
+                    <LanguageIcon />
+                    <span>{data.website}</span>
+                  </div>
+                </div>
+                {rIsLoading ? (
+                  "loading"
+                ) : userId === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>update</button>
+                ) : (
+                  <button onClick={handleFollow}>
+                    {relationshipData.includes(currentUser.id)
+                      ? "Following"
+                      : "Follow"}
+                  </button>
+                )}
+              </div>
+              <div className="right">
+                <EmailOutlinedIcon />
+                <MoreVertIcon />
               </div>
             </div>
-            <button>Follow</button>
+            <Posts userId={userId} />
           </div>
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
-          </div>
-        </div>
-        <Posts />
-      </div>
+        </>
+      )}
+
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
     </div>
   );
 }
